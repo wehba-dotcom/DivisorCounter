@@ -5,8 +5,14 @@ services:
     build:
       context: .
       dockerfile: DivisorCounter/Dockerfile
+  cache-service:
+    build:
+      context: .
+      dockerfile: CacheService/Dockerfile
     depends_on:
       - cache-db
+    ports:
+      - "5007:80"
   cache-db:
     image: "mysql"
     environment:

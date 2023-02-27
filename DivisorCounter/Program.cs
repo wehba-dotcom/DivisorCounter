@@ -2,47 +2,33 @@
 
 using System.Data;
 using System.Diagnostics;
+using System.Net;
 using Dapper;
 using MySqlConnector;
+using RestSharp;
 
 public class Program
 {
-    private static IDbConnection divisorCache = new MySqlConnection("Server=cache-db;Database=cache-database;Uid=div-cache;Pwd=C@ch3d1v;");
+    private static RestClient restClient = new RestClient("http://cache-service/");
+    //private static IDbConnection divisorCache = new MySqlConnection("Server=cache-db;Database=cache-database;Uid=div-cache;Pwd=C@ch3d1v;");
     
     public static void Main()
     {
-        var first = 1_000_000_000;
-        var last = 1_000_000_020;
+        long first = 1_000_000_000;
+        long last = 1_000_000_020;
 
         var numberWithMostDivisors = first;
         var result = 0;
 
-        divisorCache.Open();
-        var tables = divisorCache.Query<string>("SHOW TABLES LIKE 'counters'");
-        if (!tables.Any())
-        {
-            divisorCache.Execute("CREATE TABLE counters (number BIGINT NOT NULL PRIMARY KEY, divisors INT NOT NULL)");
-        }
-        
         var watch = Stopwatch.StartNew();
         for (var i = first; i <= last; i++)
         {
             var innerWatch = Stopwatch.StartNew();
-            var divisorCounter = divisorCache.QueryFirstOrDefault<int>("SELECT divisors FROM counters WHERE number = @number", new { number = i });
-
-            if (divisorCounter == 0)
-            {
-                for (var divisor = 1; divisor <= i; divisor++)
-                {
-                    if (i % divisor == 0)
-                    {
-                        divisorCounter++;
-                    }
-                }
-
-                divisorCache.Execute("INSERT INTO counters (number, divisors) VALUES (@number, @divisors)", new { number = i, divisors = divisorCounter });
-            }
+            var divisorCounter = CountDivisors(i);
             
+            // divisorCache.Execute("INSERT INTO counters (number, divisors) VALUES (@number, @divisors)", new { number = i, divisors = divisorCounter });
+            restClient.PostAsync(new RestRequest($"/cache?number={i}&divisorCounter={divisorCounter}"));
+
             innerWatch.Stop();
             Console.WriteLine("Counted " + divisorCounter + " divisors for " + i + " in " + innerWatch.ElapsedMilliseconds + "ms");
 
@@ -57,5 +43,38 @@ public class Program
         Console.WriteLine("The number with most divisors inside range is: " + numberWithMostDivisors + " with " + result + " divisors.");
         Console.WriteLine("Elapsed time: " + watch.ElapsedMilliseconds + "ms");
         Console.ReadLine();
+    }
+
+    private static int CountDivisors(long number)
+    {
+        // var divisorCounter = divisorCache.QueryFirstOrDefault<int>("SELECT divisors FROM counters WHERE number = @number", new { number = i });
+        var task = restClient.GetAsync<int>(new RestRequest("/cache?number=" + number));
+
+        //var divisorResult = task.Content.ReadAsStringAsync().Result;
+        var divisorCounter = 0; //int.Parse(divisorResult);
+
+        //if (divisorCounter == 0)
+        {
+            for (var divisor = 1; divisor <= number; divisor++)
+            {
+                if (task?.Status == TaskStatus.RanToCompletion)
+                {
+                    var cachedResult = task.Result;
+                    if (cachedResult != 0)
+                    {
+                        return cachedResult;
+                    }
+
+                    task = null;
+                }
+                    
+                if (number % divisor == 0)
+                {
+                    divisorCounter++;
+                }
+            }
+
+            return divisorCounter;
+        }
     }
 }
