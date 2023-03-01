@@ -1,7 +1,3 @@
-using System.Net;
-
-Console.WriteLine("Hostname: " + Environment.MachineName);
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,7 +10,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

@@ -11,8 +11,8 @@ services:
       dockerfile: CacheService/Dockerfile
     depends_on:
       - cache-db
-    ports:
-      - "5007:80"
+    deploy:
+      replicas: 2
   cache-db:
     image: "mysql"
     environment:
