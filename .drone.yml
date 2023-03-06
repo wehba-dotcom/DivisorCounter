@@ -24,7 +24,7 @@ name: cd
 
 platform:
   os: darwin
-  arch: amd64
+  arch: arm64
 
 steps:
   - name: compose
