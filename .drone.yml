@@ -10,6 +10,9 @@ steps:
       - dotnet publish -c Release -o out
   - name: test
     image: mcr.microsoft.com/dotnet/sdk
+    volumes:
+      - name: dockersock
+        path: /var/run
     commands:
       - dotnet test
   - name: deliver
@@ -19,3 +22,7 @@ steps:
 
 node:
   runner: drone-runner-1
+  
+volumes:
+  - name: dockersock
+    temp: {}
