@@ -20,3 +20,14 @@ trigger:
     event:
       - push
       - custom
+        
+---
+
+kind: pipeline
+type: exec
+name: default
+
+steps:
+  - name: compose
+    commands: 
+      - docker-compose up -d
