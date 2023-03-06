@@ -19,3 +19,4 @@ node:
 trigger:
     event:
       - push
+      - custom
