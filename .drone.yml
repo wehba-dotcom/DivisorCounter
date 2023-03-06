@@ -3,33 +3,19 @@ type: docker
 name: ci
 
 steps:
- - name: build
-   image: mcr.microsoft.com/dotnet/sdk
-   commands:
-    - dotnet build
-    - dotnet publish -c Release -o out
- - name: test
-   image: mcr.microsoft.com/dotnet/sdk
-   commands:
-   - dotnet test
-
-node:
-  runner: drone-runner-1
-        
----
-
-kind: pipeline
-type: exec
-name: cd
-
-platform:
-  os: darwin
-  arch: arm64
-
-steps:
-  - name: compose
+  - name: build
+    image: mcr.microsoft.com/dotnet/sdk
+    command:
+      - dotnet build
+      - dotnet publish -c Release -o out
+  - name: test
+    image: mcr.microsoft.com/dotnet/sdk
+    command:
+      - dotnet test
+  - name: deliver
+    image: docker
     commands: 
-      - docker-compose up -d
-        
+      - docker compose up -d
+
 node:
   runner: drone-runner-1
