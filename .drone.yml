@@ -11,8 +11,11 @@ steps:
  - name: test
    image: mcr.microsoft.com/dotnet/sdk
    commands:
-   - dotnet build
    - dotnet test
 
 node:
   runner: drone-runner-1
+  
+trigger:
+    event:
+      - push
