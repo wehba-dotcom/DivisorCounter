@@ -5,12 +5,12 @@ name: ci
 steps:
   - name: build
     image: mcr.microsoft.com/dotnet/sdk
-    command:
+    commands:
       - dotnet build
       - dotnet publish -c Release -o out
   - name: test
     image: mcr.microsoft.com/dotnet/sdk
-    command:
+    commands:
       - dotnet test
   - name: deliver
     image: docker
