@@ -23,7 +23,7 @@ type: exec
 name: cd
 
 platform:
-  os: linux
+  os: darwin
   arch: amd64
 
 steps:
