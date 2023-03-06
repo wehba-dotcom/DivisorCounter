@@ -29,6 +29,7 @@ services:
       - DRONE_RPC_SECRET=D0lphin7!
       - DRONE_RUNNER_CAPACITY=2
       - DRONE_RUNNER_NAME=drone-runner-1
+      - DRONE_RUNNER_LABELS=runner:drone-runner-1
     ports:
       - 3000:3000
     volumes:
