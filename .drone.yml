@@ -22,6 +22,10 @@ kind: pipeline
 type: exec
 name: cd
 
+platform:
+  os: linux
+  arch: amd64
+
 steps:
   - name: compose
     commands: 
