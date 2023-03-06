@@ -31,3 +31,6 @@ steps:
   - name: compose
     commands: 
       - docker-compose up -d
+        
+node:
+  runner: drone-runner-1
