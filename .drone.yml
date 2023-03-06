@@ -18,6 +18,7 @@ steps:
   - name: deliver
     image: docker:dind
     commands: 
+      - sleep 5
       - docker compose up -d
 
 node:
