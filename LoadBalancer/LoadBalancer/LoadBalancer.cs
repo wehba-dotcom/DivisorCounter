@@ -2,33 +2,48 @@ namespace LoadBalancer.LoadBalancer;
 
 public class LoadBalancer : ILoadBalancer
 {
-    public List<string> GetAllServices()
+    private ILoadBalancerStrategy? _strategy;
+    private readonly Dictionary<Guid, string?> _urls = new();
+    private static LoadBalancer? _instance;
+
+    private LoadBalancer()
+    { }
+
+    public static LoadBalancer GetInstance()
     {
-        throw new NotImplementedException();
+        return _instance ??= new LoadBalancer();
+    }
+    
+    public List<string?> GetAllServices()
+    {
+        return _urls.Values.ToList();
     }
 
-    public int AddService(string url)
+    public Guid AddService(string? url)
     {
-        throw new NotImplementedException();
+        var id = Guid.NewGuid();
+        _urls.Add(id, url);
+        return id;
     }
 
-    public int RemoveService(int id)
+    public Guid RemoveService(Guid id)
     {
-        throw new NotImplementedException();
+        _urls.Remove(id);
+        return id;
     }
 
-    public ILoadBalancerStrategy GetActiveStrategy()
+    public ILoadBalancerStrategy? GetActiveStrategy()
     {
-        throw new NotImplementedException();
+        return _strategy;
     }
 
-    public void SetActiveStrategy(ILoadBalancerStrategy strategy)
+    public void SetActiveStrategy(ILoadBalancerStrategy? strategy)
     {
-        throw new NotImplementedException();
+        this._strategy = strategy;
     }
 
-    public string NextService()
+    public string? NextService()
     {
-        throw new NotImplementedException();
+        return _strategy?.NextService(GetAllServices());
     }
 }
