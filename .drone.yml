@@ -8,3 +8,6 @@ steps:
    commands:
    - dotnet build app/
    - dotnet test app/
+
+node:
+  runner: drone-runner-1

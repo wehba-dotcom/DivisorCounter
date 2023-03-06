@@ -20,3 +20,16 @@ services:
       MYSQL_USER: "div-cache"
       MYSQL_PASSWORD: "C@ch3d1v"
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+  drone-runner:
+    image: drone/drone-runner-docker
+    restart: always
+    environment:
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=drone.setgo.dk:8085
+      - DRONE_RPC_SECRET=D0lphin7!
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_RUNNER_NAME=drone-runner-1
+    ports:
+      - 3000:3000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
