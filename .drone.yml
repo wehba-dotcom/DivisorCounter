@@ -16,13 +16,21 @@ steps:
     commands:
       - dotnet test
   - name: deliver
-    image: docker
+    image: docker:dind
     commands: 
       - docker compose up -d
 
 node:
   runner: drone-runner-1
-  
+
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+        
 volumes:
   - name: dockersock
     temp: {}
