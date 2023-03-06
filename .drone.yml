@@ -3,11 +3,16 @@ type: docker
 name: default
 
 steps:
+ - name: build
+   image: mcr.microsoft.com/dotnet/sdk
+   commands:
+    - dotnet build
+    - dotnet publish -c Release -o out
  - name: test
    image: mcr.microsoft.com/dotnet/sdk
    commands:
-   - dotnet build app/
-   - dotnet test app/
+   - dotnet build
+   - dotnet test
 
 node:
   runner: drone-runner-1
