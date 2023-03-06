@@ -12,7 +12,7 @@ steps:
     image: mcr.microsoft.com/dotnet/sdk
     volumes:
       - name: dockersock
-        path: /var/run
+        path: /var/run/docker.sock
     commands:
       - dotnet test
   - name: deliver
@@ -30,7 +30,7 @@ services:
     privileged: true
     volumes:
       - name: dockersock
-        path: /var/run
+        path: /var/run/docker.sock
         
 volumes:
   - name: dockersock
