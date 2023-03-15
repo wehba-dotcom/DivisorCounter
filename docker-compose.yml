@@ -11,8 +11,6 @@ services:
     build:
       context: .
       dockerfile: LoadBalancer/Dockerfile
-    ports:
-      - 8087:80
   cache-service:
     build:
       context: .
