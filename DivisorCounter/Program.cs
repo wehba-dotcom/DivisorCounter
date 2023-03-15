@@ -1,21 +1,19 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Data;
 using System.Diagnostics;
-using System.Net;
-using Dapper;
-using MySqlConnector;
 using RestSharp;
 
 public class Program
 {
-    private static RestClient restClient = new RestClient("http://cache-service/");
+    private static readonly RestClient RestClient = new RestClient("http://load-balancer/");
     //private static IDbConnection divisorCache = new MySqlConnection("Server=cache-db;Database=cache-database;Uid=div-cache;Pwd=C@ch3d1v;");
     
     public static void Main()
     {
-        long first = 1_000_000_000;
-        long last = 1_000_000_020;
+        Thread.Sleep(5000); // Let's wait for things to start up
+        
+        long first = 1_000_000_100;
+        long last = 1_000_000_200;
 
         var numberWithMostDivisors = first;
         var result = 0;
@@ -27,7 +25,7 @@ public class Program
             var divisorCounter = CountDivisors(i);
             
             // divisorCache.Execute("INSERT INTO counters (number, divisors) VALUES (@number, @divisors)", new { number = i, divisors = divisorCounter });
-            restClient.PostAsync(new RestRequest($"/cache?number={i}&divisorCounter={divisorCounter}"));
+            RestClient.PostAsync(new RestRequest($"/cache?number={i}&divisorCounter={divisorCounter}"));
 
             innerWatch.Stop();
             Console.WriteLine("Counted " + divisorCounter + " divisors for " + i + " in " + innerWatch.ElapsedMilliseconds + "ms");
@@ -48,7 +46,7 @@ public class Program
     private static int CountDivisors(long number)
     {
         // var divisorCounter = divisorCache.QueryFirstOrDefault<int>("SELECT divisors FROM counters WHERE number = @number", new { number = i });
-        var task = restClient.GetAsync<int>(new RestRequest("/cache?number=" + number));
+        var task = RestClient.GetAsync<int>(new RestRequest("/cache?number=" + number));
 
         //var divisorResult = task.Content.ReadAsStringAsync().Result;
         var divisorCounter = 0; //int.Parse(divisorResult);

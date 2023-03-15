@@ -1,22 +1,45 @@
+using System.Data;
 using System.Net;
+using CacheService.Filters;
+using MySqlConnector;
 using RestSharp;
 
-var restClient = new RestClient("https://load-balancer");
-restClient.Post(new RestRequest("configuration", Method.Post)
-    .AddJsonBody(new
+bool LoadBalancerConnector()
+{
+    var restClient = new RestClient("http://load-balancer");
+    var response = restClient.Post(new RestRequest("Configuration?url=http://" + Environment.MachineName, Method.Post));
+    if (!response.IsSuccessful)
     {
-        Url = "http://" + Environment.MachineName,
-    }));
-Console.WriteLine("Hostname: " + Environment.MachineName);
+        return false;
+    }
+
+    Console.WriteLine("Service registered successfully.");
+    return true;
+}
+
+var retryCount = 0;
+
+while(!LoadBalancerConnector() && retryCount < 3)
+{
+    Thread.Sleep(2000);
+    retryCount++;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(config =>
+{
+    config.Filters.Add(new LogFilter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IDbConnection>(c =>
+{
+    return new MySqlConnection("Server=cache-db;Database=cache-database;Uid=div-cache;Pwd=C@ch3d1v;");
+});
 
 var app = builder.Build();
 

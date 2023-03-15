@@ -9,11 +9,11 @@ namespace CacheService.Controllers;
 [Route("[controller]")]
 public class CacheController : ControllerBase
 {
-    private IDbConnection divisorCache = new MySqlConnection("Server=cache-db;Database=cache-database;Uid=div-cache;Pwd=C@ch3d1v;");
+    private IDbConnection divisorCache;
 
-    public CacheController()
+    public CacheController(IDbConnection connection)
     {
-        divisorCache.Open();
+        divisorCache = connection;
         var tables = divisorCache.Query<string>("SHOW TABLES LIKE 'counters'");
         if (!tables.Any())
         {

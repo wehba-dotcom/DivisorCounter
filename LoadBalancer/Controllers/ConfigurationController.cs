@@ -1,18 +1,21 @@
-using LoadBalancer.LoadBalancer;
+using LoadBalancer.LoadBalancer.Strategies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoadBalancer.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class ConfigurationController : ControllerBase
 {
     public ConfigurationController()
     {
-        LoadBalancer.LoadBalancer.GetInstance().SetActiveStrategy(new StaticStupidStrategy());
+        LoadBalancer.LoadBalancer.GetInstance().SetActiveStrategy(new RoundRobinStrategy());
     }
     
-    public Guid Post([FromBody] string? url)
+    [HttpPost]
+    public Guid Post([FromQuery] string? url)
     {
-        Console.WriteLine("Adding service at URL " + url);
+        Console.WriteLine("LB: Adding service at URL " + url);
         return LoadBalancer.LoadBalancer.GetInstance().AddService(url);
     }
 }

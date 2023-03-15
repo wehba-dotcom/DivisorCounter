@@ -3,7 +3,7 @@ namespace LoadBalancer.LoadBalancer;
 public class LoadBalancer : ILoadBalancer
 {
     private ILoadBalancerStrategy? _strategy;
-    private readonly Dictionary<Guid, string?> _urls = new();
+    private readonly Dictionary<Guid, Service> _services = new();
     private static LoadBalancer? _instance;
 
     private LoadBalancer()
@@ -14,21 +14,21 @@ public class LoadBalancer : ILoadBalancer
         return _instance ??= new LoadBalancer();
     }
     
-    public List<string?> GetAllServices()
+    public List<Service> GetAllServices()
     {
-        return _urls.Values.ToList();
+        return _services.Values.ToList();
     }
 
-    public Guid AddService(string? url)
+    public Guid AddService(string url)
     {
-        var id = Guid.NewGuid();
-        _urls.Add(id, url);
-        return id;
+        var service = new Service(url);
+        _services.Add(service.Id, service);
+        return service.Id;
     }
 
     public Guid RemoveService(Guid id)
     {
-        _urls.Remove(id);
+        _services.Remove(id);
         return id;
     }
 
@@ -39,10 +39,10 @@ public class LoadBalancer : ILoadBalancer
 
     public void SetActiveStrategy(ILoadBalancerStrategy? strategy)
     {
-        this._strategy = strategy;
+        _strategy = strategy;
     }
 
-    public string? NextService()
+    public Service? NextService()
     {
         return _strategy?.NextService(GetAllServices());
     }
